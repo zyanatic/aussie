@@ -29,7 +29,14 @@ def get_playerSWW():
 	data = json.loads(tree)
 	urls = []
 	sww = []
-	
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+# To-Do: 
+# Instead of just grabbing the swwPlayerIDs and adding them to the SAME list, we need to use separate lists for 
+# home_starting, home_subs, away_starting, away_subs. (Alternatively dictionary?) This is necessary, because we need to compare
+# each Teams swwPlayerIDs with their respective STATS page
+#--------------------------------------------------------------------------------------------------------------------------------------
+
 # Construct the URLs we need to navigate to
 	for element in data['PlayersPosition']:
 		urls.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+element[2]+"&assocID=10178")
@@ -42,7 +49,7 @@ def get_playerSWW():
 		sww.append(data['swwPlayerID'])
 	return;
 
-# This should get ALL tables on the page, each table can be selected by index tables[0] etc.
+# This snippet should get ALL tables on the page, each table can be selected by index tables[0] etc.
 def get_tables():
 	tables = pd.read_html("http://websites.sportstg.com/team_info.cgi?c=1-10178-171172-479810-24906261&a=STATS")
 	return;
