@@ -22,6 +22,12 @@ away_url = soup[4].get('href')
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 # Get all pIDs, needed to construct URLs for swwPlayerIDs
+#--------------------------------------------------------------------------------------------------------------------------------------
+# To-Do: 
+# Instead of just grabbing the swwPlayerIDs and adding them to the SAME list, we need to use separate lists for 
+# home_starting, home_subs, away_starting, away_subs. (Alternatively dictionary?) This is necessary, because we need to compare
+# each Teams swwPlayerIDs with their respective STATS page
+#--------------------------------------------------------------------------------------------------------------------------------------
 def get_playerSWW():
 	page = requests.get("https://membership.sportstg.com/results/getplayerpositions_match.cgi?aID=20551&mID=30326058")
 	tree = page.content
@@ -29,13 +35,6 @@ def get_playerSWW():
 	data = json.loads(tree)
 	urls = []
 	sww = []
-
-#--------------------------------------------------------------------------------------------------------------------------------------
-# To-Do: 
-# Instead of just grabbing the swwPlayerIDs and adding them to the SAME list, we need to use separate lists for 
-# home_starting, home_subs, away_starting, away_subs. (Alternatively dictionary?) This is necessary, because we need to compare
-# each Teams swwPlayerIDs with their respective STATS page
-#--------------------------------------------------------------------------------------------------------------------------------------
 
 # Construct the URLs we need to navigate to
 	for element in data['PlayersPosition']:
