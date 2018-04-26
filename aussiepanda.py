@@ -29,6 +29,7 @@ away_url = soup[4].get('href')
 # each Teams swwPlayerIDs with their respective STATS page
 #--------------------------------------------------------------------------------------------------------------------------------------
 def get_playerSWW():
+	# Here is where we need aID and mID
 	page = requests.get("https://membership.sportstg.com/results/getplayerpositions_match.cgi?aID=20551&mID=30326058")
 	tree = page.content
 
@@ -38,6 +39,7 @@ def get_playerSWW():
 
 # Construct the URLs we need to navigate to
 	for element in data['PlayersPosition']:
+		# Here is where we need aID (same as assocID) again
 		urls.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+element[2]+"&assocID=10178")
 
 # Visit each URL and grab the swwPlayerID
