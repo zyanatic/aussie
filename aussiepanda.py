@@ -16,9 +16,8 @@ away_url = soup[4].get('href')
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 # To-Do:
-# To construct this URL https://membership.sportstg.com/results/getplayerpositions_match.cgi?aID=20551&mID=19926341
-# that we use in the next step, we need to scrape aID, and mID using 
-# <div style="display:none;" id="aid">10178</div> and <div class = "fixturerow" id = "extfix_19926341">
+# Find a way to scrape this URL https://membership.sportstg.com/results/getplayerpositions_match.cgi?aID=20551&mID=19926341
+# which is not in a href tag
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 # Get all pIDs, needed to construct URLs for swwPlayerIDs
