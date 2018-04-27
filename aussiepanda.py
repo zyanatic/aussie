@@ -10,15 +10,18 @@ tree = page.content
 soup = BeautifulSoup(tree,"html5lib")
 
 # Get the URLs for home and away teams, later needed to construct URLs for each STATS page
-soup = soup.find_all(href=re.compile("team_info"))
-home_url = soup[2].get('href')
-away_url = soup[4].get('href')
+team_info = soup.find_all(href=re.compile("team_info"))
+home_url = team_info[2].get('href')
+away_url = team_info[4].get('href')
 
-#--------------------------------------------------------------------------------------------------------------------------------------
-# To-Do:
-# Find a way to scrape this URL https://membership.sportstg.com/results/getplayerpositions_match.cgi?aID=20551&mID=19926341
-# which is not in a href tag
-#--------------------------------------------------------------------------------------------------------------------------------------
+# Get the aID / assocID
+# For games between teams from different associations (e.g. cup, friendly) we will have to see if we can get each teams aID separately
+aid = soup.find(id="aid").get_text()
+
+# This grabs the URL used to get the lineups
+selteam = soup.find_all(attrs={"data-selteam":True})
+for a in selteam:
+	getplayerpositions_match = a['data-selteam']
 
 # Get all pIDs, needed to construct URLs for swwPlayerIDs
 #--------------------------------------------------------------------------------------------------------------------------------------
@@ -28,8 +31,7 @@ away_url = soup[4].get('href')
 # each Teams swwPlayerIDs with their respective STATS page
 #--------------------------------------------------------------------------------------------------------------------------------------
 def get_playerSWW():
-	# Here is where we need aID and mID
-	page = requests.get("https://membership.sportstg.com/results/getplayerpositions_match.cgi?aID=20551&mID=30326058")
+	page = requests.get(getplayerpositions_match)
 	tree = page.content
 
 	data = json.loads(tree)
@@ -37,17 +39,22 @@ def get_playerSWW():
 	sww = []
 
 # Construct the URLs we need to navigate to
-	for element in data['PlayersPosition']:
+	for pid in data['PlayersPosition']:
 		# Here is where we need aID (same as assocID) again
-		urls.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+element[2]+"&assocID=10178")
+		urls.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
 
 # Visit each URL and grab the swwPlayerID
+# This is extremely slow, but I see no way to get reliable results without another unique identifier for players and I don't see one
 	for link in urls:
 		page = requests.get(link)
 		tree = page.content
 		data = json.loads(tree)
 		sww.append(data['swwPlayerID'])
+	#print(sww)
 	return;
+
+#get_playerSWW()
+
 
 # This snippet should get ALL tables on the page, each table can be selected by index tables[0] etc.
 def get_tables():
