@@ -10,6 +10,7 @@ tree = page.content
 soup = BeautifulSoup(tree,"html5lib")
 
 # Get the URLs for home and away teams, later needed to construct URLs for each STATS page
+# This can possibly be improved for flexibility
 team_info = soup.find_all(href=re.compile("team_info"))
 home_url = team_info[2].get('href')
 away_url = team_info[4].get('href')
