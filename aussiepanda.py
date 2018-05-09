@@ -4,6 +4,9 @@ import json
 from lxml import html
 from bs4 import BeautifulSoup
 import re
+import os
+
+playerlist = "D:/players.txt"
 
 page = requests.get("http://websites.sportstg.com/round_info.cgi?c=1-10178-151184-391992-24906259&pool=&fixture=65922965&a=SELECT")
 tree = page.content
@@ -44,17 +47,21 @@ def get_playerSWW():
 		# Here is where we need aID (same as assocID) again
 		urls.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
 
-# Visit each URL and grab the swwPlayerID
-# This is extremely slow, but I see no way to get reliable results without another unique identifier for players and I don't see one
+# Visit each URL and grab the swwPlayerID and write them to a text file
 	for link in urls:
 		page = requests.get(link)
 		tree = page.content
 		data = json.loads(tree)
 		sww.append(data['swwPlayerID'])
-	#print(sww)
+		with open(playerlist, "a") as csvfile:	
+			print(data['swwPlayerID'], file=csvfile)
 	return;
 
-#get_playerSWW()
+# Checks if txt file with sww player ids already exists, if it's not there, executes the function
+if os.path.isfile(playerlist):
+	print("Player list already exists")
+else:
+	get_playerSWW()
 
 
 # This snippet should get ALL tables on the page, each table can be selected by index tables[0] etc.
