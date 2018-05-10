@@ -19,7 +19,7 @@ for div in home_logo:
 away_logo = soup.findAll('div', {'class' : 'awayteam'})
 for div in away_logo:
     away_url = "http://websites.sportstg.com/" + div.find('a')['href']
-print(home_url)
+
 # Get the aID / assocID
 # For games between teams from different associations (e.g. cup, friendly) we will have to see if we can get each teams aID separately
 aid = soup.find(id="aid").get_text()
@@ -30,17 +30,14 @@ for a in selteam:
 	getplayerpositions_match = a['data-selteam']
 
 # Get all pIDs, needed to construct URLs for swwPlayerIDs
-#--------------------------------------------------------------------------------------------------------------------------------------
-# To-Do: 
-# Instead of just grabbing the swwPlayerIDs and adding them to the SAME list, we need to use separate lists for 
-# home_starting, home_subs, away_starting, away_subs. (Alternatively dictionary?) This is necessary, because we need to compare
-# each Teams swwPlayerIDs with their respective STATS page
-#--------------------------------------------------------------------------------------------------------------------------------------
 def get_playerSWW():
 	page = requests.get(getplayerpositions_match)
 	tree = page.content
-
 	data = json.loads(tree)
+	home_starting_url = []
+	home_subs_url = []
+	away_starting_url = []
+	away_subs_url = []
 	home_starting = []
 	home_subs = []
 	away_starting = []
@@ -48,33 +45,50 @@ def get_playerSWW():
 	sww = []
 	x = -1
 
-# Construct the URLs we need to navigate to. starting and subs URLs are the same for each team, but it makes sense to keep them
-# separated for later
+# Construct the URLs we need to navigate to
 	for pid in data['PlayersPosition']:
 		x = x + 1
 		if "Home" in str(data['PlayersPosition'][x][0]) and "Sub" not in str(data['PlayersPosition'][x][0]):
-			home_starting.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
+			home_starting_url.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
 		elif "Home" in str(data['PlayersPosition'][x][0]) and "Sub" in str(data['PlayersPosition'][x][0]):
-			home_subs.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
+			home_subs_url.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
 		elif "Away" in str(data['PlayersPosition'][x][0]) and "Sub" not in str(data['PlayersPosition'][x][0]):
-			away_starting.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
+			away_starting_url.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
 		elif "Away" in str(data['PlayersPosition'][x][0]) and "Sub" in str(data['PlayersPosition'][x][0]):
-			away_subs.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
+			away_subs_url.append("http://websites.sportstg.com/aj_swwid.cgi?playerID="+pid[2]+"&assocID="+aid)
 
-# Visit each URL and grab the swwPlayerID and write them to a text file - This is probably useless, we need to pull all
-# swwPlayerIDs anyway, as lineups always change, only pulling them once and saving to text file does not help. 
-# Instead of just appending all IDs to one list, we need to do this for home_starting, home_subs, etc.
-#
-#	for link in home_url:
-#		page = requests.get(link)
-#		tree = page.content
-#		data = json.loads(tree)
-#		sww.append(data['swwPlayerID'])
+# Visit each URL and grab the swwPlayerID. Maybe this can be done more efficiently?
+	for link in home_starting_url:
+		page = requests.get(link)
+		tree = page.content
+		data = json.loads(tree)
+		home_starting.append(data['swwPlayerID'])
+
+	for link in home_subs_url:
+		page = requests.get(link)
+		tree = page.content
+		data = json.loads(tree)
+		home_subs.append(data['swwPlayerID'])
+
+	for link in home_starting_url:
+		page = requests.get(link)
+		tree = page.content
+		data = json.loads(tree)
+		away_starting.append(data['swwPlayerID'])
+
+	for link in home_starting_url:
+		page = requests.get(link)
+		tree = page.content
+		data = json.loads(tree)
+		away_subs.append(data['swwPlayerID'])	
+
+# Printing to text file does not help us, as lineups always change and we are only getting lists of IDs of players who are in the lineup
+#	print(home_starting)
 #		with open(playerlist, "w") as csvfile:	
 #			print(data['swwPlayerID'], file=csvfile)
 	return;
 
-# Checks if txt file with sww player ids already exists, if it's not there, executes the function. See above, probably not needed.
+# Checks if txt file with sww player ids already exists, if it's not there, executes the function
 #if os.path.isfile(playerlist):
 #	print("Player list already exists")
 #else:
